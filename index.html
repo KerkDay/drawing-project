@@ -1,0 +1,126 @@
+
+
+<style>
+  div#drawing-container {
+    position: relative;
+    background-image: url("background.jpg");
+    aspect-ratio: 253 / 364;
+    background-size: cover;
+    max-width: 1265px;
+    max-height: 100vh;
+    margin: auto;
+  }
+  div.drawing-pencil-container {
+    position: absolute;
+    left: -40px;
+    top: 100px;
+  }
+  img#drawing-pencil {
+    position: absolute;
+    width: 40px
+  }
+  canvas#drawing-canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<div id="drawing-container">
+  <canvas id="drawing-canvas">
+  </canvas>
+  <div class="drawing-pencil-container">
+    <img 
+      id="drawing-pencil"
+      alt="Said The Whale Commemorative Pencil"
+      src="NewPencil.png"
+    />
+  </div>
+</div>
+
+<script>
+  const pencilOffset={x: 19, y: 294},
+    pencilEl = document.getElementById("drawing-pencil"),
+    canvasEl = document.getElementById("drawing-canvas"),
+    ctx = canvasEl.getContext("2d")
+
+  canvasEl.width = canvasEl.getBoundingClientRect().width
+  canvasEl.height = canvasEl.getBoundingClientRect().height
+
+  let drawing = false,
+    canvasCursor = {x: -1, y: -1},
+    mouseOrig = {x: 0, y: 0},
+    penOrig = {x: 0, y: 0}
+
+  pencilEl.onmousedown = onStartDrag
+  pencilEl.ontouchmove = onStartDrag
+  
+  function onStartDrag(e) {
+    e.preventDefault()
+    drawing = true
+    ctx.fillStyle = "#3d3d3a"
+    ctx.lineCap = 'round'
+
+    if (e.clientX) {
+      mouseOrig = {
+        x: e.clientX,
+        y: e.clientY
+      }
+    } else {
+      mouseOrig = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      }
+    }
+
+    penOrig = {
+      x: parseInt(pencilEl.style.left) || 0,
+      y: parseInt(pencilEl.style.top) || 0
+    }
+
+  }
+
+  pencilEl.onmouseup = onEndDrag
+  pencilEl.ontouchstart = onEndDrag
+  
+  function onEndDrag(e) {
+    drawing = false
+    ctx.stroke()
+    ctx.beginPath()
+  }
+
+  pencilEl.onmousemove = onDrag
+  pencilEl.ontouchmove = onDrag
+  
+  function onDrag(e) {
+    e.preventDefault()
+    if (drawing) {
+      let n = {x: 0, y: 0}
+      if (e.clientX) {
+        n = {
+          x: e.clientX,
+          y: e.clientY
+        }
+      } else {
+        n = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY
+        }
+      }
+
+      const pencilPos = pencilEl.getBoundingClientRect()
+      const canvasPos = canvasEl.getBoundingClientRect()
+
+      pencilEl.style.left = penOrig.x + n.x - mouseOrig.x
+      pencilEl.style.top = penOrig.y + n.y - mouseOrig.y
+
+      canvasCursor = {
+        x: pencilPos.left - canvasPos.left + pencilOffset.x,
+        y: pencilPos.top - canvasPos.top + pencilOffset.y
+      }
+
+      ctx.lineTo(canvasCursor.x, canvasCursor.y);
+      ctx.stroke()
+    }
+  }
+</script>

@@ -7,7 +7,7 @@
     aspect-ratio: 253 / 364;
     background-size: cover;
     max-width: 1265px;
-    max-height: 100vh;
+    max-height: 100%;
     margin: auto;
   }
   div.drawing-pencil-container {
@@ -108,19 +108,32 @@
         }
       }
 
-      const pencilPos = pencilEl.getBoundingClientRect()
-      const canvasPos = canvasEl.getBoundingClientRect()
-
       pencilEl.style.left = penOrig.x + n.x - mouseOrig.x
       pencilEl.style.top = penOrig.y + n.y - mouseOrig.y
 
-      canvasCursor = {
-        x: pencilPos.left - canvasPos.left + pencilOffset.x,
-        y: pencilPos.top - canvasPos.top + pencilOffset.y
-      }
-
-      ctx.lineTo(canvasCursor.x, canvasCursor.y);
-      ctx.stroke()
+      debounce(draw())
     }
   }
+
+  function draw() {
+    const pencilPos = pencilEl.getBoundingClientRect()
+    const canvasPos = canvasEl.getBoundingClientRect()
+    
+    canvasCursor = {
+      x: pencilPos.left - canvasPos.left + pencilOffset.x,
+      y: pencilPos.top - canvasPos.top + pencilOffset.y
+    }
+
+    ctx.lineTo(canvasCursor.x, canvasCursor.y);
+    ctx.stroke()
+  }
+  
+  function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+  }
+
 </script>

@@ -57,7 +57,7 @@
     penOrig = {x: 0, y: 0}
 
   pencilEl.onmousedown = onStartDrag
-  pencilEl.ontouchmove = onStartDrag
+  pencilEl.ontouchstart = onStartDrag
   
   function onStartDrag(e) {
     e.preventDefault()
@@ -85,9 +85,10 @@
   }
 
   pencilEl.onmouseup = onEndDrag
-  pencilEl.ontouchstart = onEndDrag
+  pencilEl.ontouchend = onEndDrag
   
   function onEndDrag(e) {
+    e.preventDefault()
     drawing = false
     ctx.stroke()
     ctx.beginPath()
